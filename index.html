@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Wallet</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c31;--line:#2b3857;--text:#edf3ff;--muted:#9eacc8;--blue:#8ba5ff;--green:#48d6a5;--red:#ff8294}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 500px at 10% -10%,#203366 0%,transparent 60%),var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.brand{display:flex;gap:12px;align-items:center}.logo{background:linear-gradient(135deg,#7c9cff,#7b61ff);border-radius:14px;width:46px;height:46px;display:grid;place-items:center;font-size:24px;font-weight:900}.brand h1{margin:0;font-size:23px}.muted{color:var(--muted)}.small{font-size:12px}.banner{border:1px solid #695c2e;background:#2a2518;color:#ffe4a0;border-radius:13px;padding:12px;margin-bottom:16px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab,button{cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:750;background:#263451;color:var(--text)}.tab.active,button.primary{background:var(--blue);color:#08132c;border-color:var(--blue)}button.good{background:var(--green);color:#06251b}button.bad{background:#4a2430;color:#ffb6c0}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid .card{margin:0}h2{font-size:17px;margin:0 0 12px}label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}input,select{width:100%;padding:11px;background:#0b1222;border:1px solid var(--line);border-radius:10px;color:var(--text);font:inherit}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.row button{flex:0 0 auto}.hidden{display:none!important}.balance{font-size:31px;font-weight:850;background:linear-gradient(135deg,#273d80,#403278);padding:17px;border-radius:13px}.msg{padding:10px;border-radius:10px;background:#182541;margin:10px 0;white-space:pre-wrap}.goodtext{color:#7ff0c4}.badtext{color:#ffabb7}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:11px}.tablewrap{overflow-x:auto}.status{display:inline-block;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:800}.pending{background:#3a301c;color:#ffd98a}.approved{background:#123b31;color:#7ff0c4}.rejected{background:#44232c;color:#ffabb7}.footer{text-align:center;color:var(--muted);font-size:12px;margin:22px 0}@media(max-width:700px){.grid{grid-template-columns:1fr}.wrap{padding:13px}.card{padding:14px}table{min-width:550px}}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="logo">N</div><div><h1>Nova Wallet</h1><div class="muted small">Customer portal & owner dashboard</div></div></div><div id="authLabel" class="muted small">Not signed in</div></header>
+<div class="banner"><b>Setup required:</b> Add your Supabase project URL and anon key in this file after creating the database. This starter records deposit requests only; it does not process or verify payments. Never ask customers for bank PINs, passwords, or OTPs.</div>
+<nav class="tabs"><button class="tab active" data-tab="account">Account</button><button class="tab" data-tab="admin">Owner Admin</button><button class="tab" data-tab="setup">Setup</button></nav>
+<section id="accountTab">
+<div class="grid">
+<div class="card"><h2>Sign in / create account</h2><p class="muted small">Use an email you control. For public launch, configure email confirmation in Supabase.</p>
+<label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+<div class="row" style="margin-top:12px"><button class="primary" id="signup">Create account</button><button id="signin">Sign in</button></div><button id="signout" class="hidden" style="margin-top:10px">Sign out</button><div id="authMsg" class="msg hidden"></div></div>
+<div class="card"><h2>My wallet</h2><div id="walletBalance" class="balance">Sign in to view</div><p class="muted small">Balance changes are controlled by server-side database rules and the owner approval process.</p>
+<h2 style="margin-top:18px">Request a deposit</h2><label>Amount (PKR)</label><input id="amount" type="number" min="1" step="1" placeholder="1000"><label>Payment method</label><select id="method"><option>Bank transfer</option><option>JazzCash</option><option>Easypaisa</option><option>Other</option></select><label>Reference (optional)</label><input id="reference" maxlength="80" placeholder="Reference only — never share OTP/PIN"><button class="primary" id="requestDeposit" style="margin-top:12px">Submit request</button><div id="depositMsg" class="msg hidden"></div></div>
+<div class="card"><h2>My deposit requests</h2><div id="myRequests" class="muted small">Sign in to view requests.</div></div>
+<div class="card"><h2>My transaction history</h2><div id="myTransactions" class="muted small">Sign in to view history.</div></div>
+</div></section>
+<section id="adminTab" class="hidden"><div class="card"><h2>Owner Admin</h2><p class="muted small">Only accounts assigned the owner role in the database can review requests. Never set the owner role from this public page.</p><div id="adminStatus" class="msg">Sign in with your owner account to continue.</div><button class="primary" id="refreshAdmin">Refresh requests</button><div id="adminRequests" style="margin-top:14px"></div></div></section>
+<section id="setupTab" class="hidden"><div class="card"><h2>Quick setup checklist</h2><ol><li>Create a Supabase project and run <code>supabase/schema.sql</code> in SQL Editor.</li><li>In Supabase Authentication, enable email/password. Create your owner account through this page.</li><li>In SQL Editor, assign the owner role to your exact account using the command in README.md.</li><li>Put your Project URL and anon/public key into the configuration section in this HTML file.</li><li>Upload the <code>public</code> folder to Cloudflare Pages or another static host.</li><li>Test with a separate customer account. Do not use real money until you have verified all permissions and your payment process.</li></ol><p>Hosting makes the page public; Supabase provides the database and authentication. This starter does not integrate any payment provider.</p></div></section>
+<div class="footer">Nova Wallet • Starter project • Not a bank or payment processor</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// SETUP: Replace these two placeholders with your Supabase Project URL and anon/public key.
+// Never put a service_role key or any private secret in browser code.
+const SUPABASE_URL = "PASTE_SUPABASE_PROJECT_URL_HERE";
+const SUPABASE_ANON_KEY = "PASTE_SUPABASE_ANON_KEY_HERE";
+const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("PASTE_") && !SUPABASE_ANON_KEY.includes("PASTE_");
+const db = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const $=id=>document.getElementById(id);
+let currentUser=null;
+function note(id,text,ok=false){const el=$(id);el.textContent=text;el.classList.remove('hidden');el.className='msg '+(ok?'goodtext':'badtext')}
+function money(n){return 'PKR '+Number(n||0).toLocaleString('en-PK',{maximumFractionDigits:0})}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function table(rows,heads){if(!rows.length)return '<div class="msg">No records yet.</div>';return '<div class="tablewrap"><table><thead><tr>'+heads.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'}
+function status(s){return '<span class="status '+escapeHtml(s)+'">'+escapeHtml(s.toUpperCase())+'</span>'}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['account','admin','setup'].forEach(t=>$(t+'Tab').classList.toggle('hidden',t!==b.dataset.tab));if(b.dataset.tab==='admin')loadAdmin()}));
+async function refresh(){
+ if(!db){$('walletBalance').textContent='Setup required';$('authLabel').textContent='Supabase not configured';return}
+ const {data:{session}}=await db.auth.getSession();currentUser=session?.user||null;
+ $('authLabel').textContent=currentUser?currentUser.email:'Not signed in';
+ $('signup').classList.toggle('hidden',!!currentUser);$('signin').classList.toggle('hidden',!!currentUser);$('signout').classList.toggle('hidden',!currentUser);
+ if(!currentUser){$('walletBalance').textContent='Sign in to view';$('myRequests').textContent='Sign in to view requests.';$('myTransactions').textContent='Sign in to view history.';return}
+ const {data:wallet,error:werr}=await db.from('wallets').select('balance').eq('user_id',currentUser.id).maybeSingle();
+ $('walletBalance').textContent=werr?'Could not load balance':money(wallet?.balance||0);
+ const {data:reqs,error:rerr}=await db.from('deposit_requests').select('id,amount,method,reference,status,created_at').order('created_at',{ascending:false}).limit(50);
+ $('myRequests').innerHTML=rerr?'Could not load requests.':table((reqs||[]).map(r=>`<tr><td>${money(r.amount)}</td><td>${escapeHtml(r.method)}</td><td>${status(r.status)}</td><td>${escapeHtml(new Date(r.created_at).toLocaleString())}</td></tr>`),['Amount','Method','Status','Submitted']);
+ const {data:txs,error:terr}=await db.from('wallet_transactions').select('amount,kind,note,created_at').order('created_at',{ascending:false}).limit(50);
+ $('myTransactions').innerHTML=terr?'Could not load history.':table((txs||[]).map(t=>`<tr><td>${escapeHtml(new Date(t.created_at).toLocaleString())}</td><td>${escapeHtml(t.kind)}</td><td>${money(t.amount)}</td><td>${escapeHtml(t.note||'')}</td></tr>`),['Date','Type','Amount','Note']);
+}
+$('signup').onclick=async()=>{if(!db)return note('authMsg','First complete Supabase setup in README.md.');const email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8)return note('authMsg','Enter a valid email and password of at least 8 characters.');const {error}=await db.auth.signUp({email,password});if(error)return note('authMsg',error.message);note('authMsg','Account request submitted. Check your email if confirmation is enabled.',true);await refresh()};
+$('signin').onclick=async()=>{if(!db)return note('authMsg','First complete Supabase setup in README.md.');const {error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return note('authMsg',error.message);note('authMsg','Signed in.',true);await refresh()};
+$('signout').onclick=async()=>{await db.auth.signOut();await refresh()};
+$('requestDeposit').onclick=async()=>{if(!db)return note('depositMsg','First complete Supabase setup in README.md.');if(!currentUser)return note('depositMsg','Please sign in first.');const amount=Number($('amount').value);if(!Number.isSafeInteger(amount)||amount<1)return note('depositMsg','Enter a positive whole-number amount.');const {error}=await db.from('deposit_requests').insert({user_id:currentUser.id,amount,method:$('method').value,reference:$('reference').value.trim()||null});if(error)return note('depositMsg',error.message);$('amount').value='';$('reference').value='';note('depositMsg','Request submitted. It will not credit your balance until the owner verifies and approves it.',true);await refresh()};
+async function loadAdmin(){
+ if(!db){$('adminStatus').textContent='Complete Supabase setup first.';return}
+ if(!currentUser){$('adminStatus').textContent='Sign in with your owner account first.';$('adminRequests').innerHTML='';return}
+ const {data:profile,error:pErr}=await db.from('profiles').select('role').eq('id',currentUser.id).maybeSingle();
+ if(pErr||profile?.role!=='owner'){$('adminStatus').textContent='Access denied: this account is not assigned the owner role.';$('adminRequests').innerHTML='';return}
+ $('adminStatus').textContent='Owner access verified by the database.';
+ const {data:reqs,error}=await db.from('deposit_requests').select('id,user_id,amount,method,reference,status,created_at').order('created_at',{ascending:false}).limit(100);
+ if(error){$('adminRequests').textContent='Could not load requests: '+error.message;return}
+ $('adminRequests').innerHTML=table((reqs||[]).map(r=>`<tr><td>${escapeHtml(r.user_id.slice(0,8))}…</td><td>${money(r.amount)}</td><td>${escapeHtml(r.method)}<div class="muted small">${escapeHtml(r.reference||'No reference')}</div></td><td>${status(r.status)}</td><td>${r.status==='pending'?`<button class="good" data-review="approve" data-id="${escapeHtml(r.id)}">Approve</button> <button class="bad" data-review="reject" data-id="${escapeHtml(r.id)}">Reject</button>`:'Reviewed'}</td></tr>`),['Customer ID','Amount','Method / reference','Status','Action']);
+}
+$('refreshAdmin').onclick=loadAdmin;
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-review]');if(!b||!db)return;if(!currentUser)return;const action=b.dataset.review;const {data,error}=await db.rpc('review_deposit_request',{p_request_id:b.dataset.id,p_action:action});if(error){$('adminStatus').textContent='Review failed: '+error.message;return} $('adminStatus').textContent='Request '+action+'d. '+(data?.message||'');await loadAdmin();await refresh()});
+if(db){db.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});refresh()}else{ $('authLabel').textContent='Setup required';$('walletBalance').textContent='Connect Supabase first';note('authMsg','Open README.md and follow the setup steps.')}
+</script></body></html>
