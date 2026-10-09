@@ -31,8 +31,8 @@
 <script>
 // SETUP: Replace these two placeholders with your Supabase Project URL and anon/public key.
 // Never put a service_role key or any private secret in browser code.
-const SUPABASE_URL = "PASTE_SUPABASE_PROJECT_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_SUPABASE_ANON_KEY_HERE";
+const SUPABASE_URL = "https://btfzxnnoceeauzmvjzjvt.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_h695-7HamTxS6HA8G3gRTw_ZEYABBt3";
 const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("PASTE_") && !SUPABASE_ANON_KEY.includes("PASTE_");
 const db = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const $=id=>document.getElementById(id);
